@@ -1,6 +1,7 @@
+import { TextField } from "@mui/material";
 import React from "react";
 
-function InputFields({ handleSubmit, ...props }) {
+export const InputFields = ({ handleSubmit, ...props }) => {
   return (
     <form onSubmit={handleSubmit} className="input-fields">
       <label>Color</label>
@@ -10,4 +11,9 @@ function InputFields({ handleSubmit, ...props }) {
   );
 }
 
-export default InputFields;
+
+export const InputV2field = () => {
+    return (
+      <TextField id="outlined-basic" label="Outlined" variant="outlined" />
+    );
+}

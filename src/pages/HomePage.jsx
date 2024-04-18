@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import InputFields from "../components/InputFields";
+import { InputFields } from "../components/InputFields";
 import useFetch from "../hooks/CustomHooks";
 import ColorTable from "../components/ColorTable";
 
@@ -22,8 +22,8 @@ function HomePage() {
     setInputvalue(value);
   };
 
-    const handleSubmit = (e) => {
-      setErrorData(false)
+  const handleSubmit = (e) => {
+    setErrorData(false);
     e.preventDefault();
     setsubmitedInputvalue(inputValue);
 
@@ -32,11 +32,11 @@ function HomePage() {
     const rgbRegex = /^rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)$/;
 
     if (hexRegex.test(inputValue) || rgbRegex.test(inputValue)) {
-      const searchRGB = hexToRgb(inputValue);
+      const searchRGB = formatColor(inputValue);
 
       const closestColors = data.map((color) => ({
         ...color,
-        distance: calculateDistance(searchRGB, hexToRgb(color.hex)),
+        distance: calculateDistance(searchRGB, formatColor(color.hex)),
       }));
       closestColors.sort((a, b) => a.distance - b.distance);
       setResultData(closestColors.slice(0, 100));
@@ -45,12 +45,28 @@ function HomePage() {
     }
   };
 
-  const hexToRgb = (hex) => {
-    let clr = hex.replace("#", "");
-    const r = parseInt(clr.substring(0, 2), 16);
-    const g = parseInt(clr.substring(2, 4), 16);
-    const b = parseInt(clr.substring(4, 6), 16);
-    return { r, g, b };
+  const formatColor = (color) => {
+    if (color.startsWith("#")) {
+      color = color.replace("#", "");
+
+      const r = parseInt(color.substring(0, 2), 16);
+      const g = parseInt(color.substring(2, 4), 16);
+      const b = parseInt(color.substring(4, 6), 16);
+
+      return { r, g, b };
+    }
+
+    if (color.startsWith("rgb(")) {
+      // Extract RGB values
+      const rgb = color.substring(4, color.length - 1).split(",");
+      const r = parseInt(rgb[0].trim(), 10);
+      const g = parseInt(rgb[1].trim(), 10);
+      const b = parseInt(rgb[2].trim(), 10);
+
+      return { r, g, b };
+    }
+
+    return null;
   };
 
   const calculateDistance = (color1, color2) => {
@@ -81,7 +97,10 @@ function HomePage() {
           <button>click here to retry</button>
         </div>
       ) : errorData ? (
-        <p>inputed value is not a valide color code</p>
+        <>
+          <p>inputed value is not a valide color code,please use another format </p>
+          <p>eg:#ff0000,rgb(0,255,0) </p>
+        </>
       ) : (
         <ColorTable tableData={resultData} />
       )}
